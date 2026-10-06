@@ -1,0 +1,103 @@
+/* Variant 3 · prompt 7 «Strong photo behind a giant word»: full-bleed interior as page bg; giant serif NOAK; circle reveals. */
+.v-giant { background: #0e0c10; color: rgba(255, 246, 250, .88); }
+.v-giant h1, .v-giant h2, .v-giant h3 { color: #fff; }
+
+.g-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #0e0c10; }
+.g-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 55% 40%; transform: scale(1.04); transition: transform .9s cubic-bezier(.2, .7, .2, 1); }
+.g-bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(14, 12, 16, .35) 0%, rgba(14, 12, 16, .5) 45%, rgba(14, 12, 16, .88) 100%);
+}
+.g-bg::before { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(10, 8, 12, .55); opacity: var(--veil, 0); }
+
+.g-curtain { display: none; }
+.js .g-curtain { display: block; position: fixed; inset: 0; z-index: 40; background: #1a1016; pointer-events: none; transition: opacity 1s ease .15s, visibility 0s linear 1.2s; }
+.js.g-ready .g-curtain { opacity: 0; visibility: hidden; }
+.js .g-bg img { clip-path: circle(0% at 50% 50%); }
+.js.g-ready .g-bg img { clip-path: circle(80% at 50% 50%); transition: clip-path 1.6s cubic-bezier(.6, 0, .2, 1) .25s, transform .9s cubic-bezier(.2, .7, .2, 1); }
+.js .g-word { letter-spacing: .32em; opacity: 0; }
+.js.g-ready .g-word { letter-spacing: .02em; opacity: 1; transition: letter-spacing 1.8s cubic-bezier(.2, .7, .2, 1) .5s, opacity 1.2s ease .5s; }
+.js .g-pre, .js .g-slogan, .js .g-bottom { opacity: 0; transform: translateY(14px); }
+.js.g-ready .g-pre, .js.g-ready .g-slogan, .js.g-ready .g-bottom { opacity: 1; transform: none; transition: opacity .9s ease 1.1s, transform .9s ease 1.1s; }
+@media (prefers-reduced-motion: reduce) {
+  .js .g-curtain { display: none; }
+  .js .g-bg img, .js.g-ready .g-bg img { clip-path: none; transition: none; }
+  .js .g-word, .js .g-pre, .js .g-slogan, .js .g-bottom { opacity: 1; transform: none; letter-spacing: .02em; transition: none; }
+}
+
+.v-giant .site-header { background: rgba(14, 12, 16, .78); border-bottom-color: rgba(255, 255, 255, .08); }
+.v-giant .desk-nav a { color: #fff; }
+.v-giant .desk-nav a:hover { color: var(--neon-soft); }
+.v-giant .order-link { color: rgba(255, 255, 255, .75); }
+.v-giant .order-link:hover { color: #fff; }
+.v-giant .menu-btn { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .4); }
+.v-giant .site-menu { background: #140f16; }
+.v-giant .menu-nav a { color: #fff; border-bottom-color: rgba(255, 255, 255, .1); }
+.v-giant .menu-nav .menu-order, .v-giant .menu-contacts { color: rgba(255, 255, 255, .7); }
+.v-giant .menu-contacts a { color: #fff; }
+.v-giant .demo-strip { background: #0a070a; }
+.v-giant .brand-sub { color: rgba(255, 255, 255, .55); }
+
+.g-hero { min-height: calc(100vh - var(--chrome-h)); min-height: calc(100svh - var(--chrome-h)); display: flex; }
+.g-hero-inner { display: flex; flex-direction: column; justify-content: flex-end; padding: 40px 0 36px; min-width: 0; }
+.g-title { margin: 0; display: grid; }
+.g-pre {
+  font-family: var(--font-body); font-weight: 500; font-size: clamp(.85rem, .75rem + .5vw, 1.1rem);
+  letter-spacing: .28em; text-transform: uppercase; color: rgba(255, 255, 255, .92);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .45);
+}
+.g-word {
+  font-family: var(--font-serif); font-weight: 600; line-height: .82; margin: .06em 0 .04em -.04em;
+  font-size: clamp(4.2rem, 22vw, 18rem); color: #fff; mix-blend-mode: overlay; white-space: nowrap;
+}
+.g-slogan {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: clamp(1.2rem, 1rem + 1vw, 1.8rem); color: #fff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, .5);
+}
+.g-bottom {
+  margin-top: 26px; padding-top: 22px; border-top: 1px solid rgba(255, 255, 255, .25);
+  display: grid; gap: 20px;
+}
+.g-bottom .lead { color: rgba(255, 255, 255, .92); max-width: 54ch; text-shadow: 0 1px 10px rgba(0, 0, 0, .55); }
+.g-bottom .hero-cta { margin-top: 0; }
+.btn-glass { background: rgba(255, 255, 255, .08); color: #fff; border-color: rgba(255, 255, 255, .55); backdrop-filter: blur(4px); }
+.btn-glass:hover { background: rgba(255, 255, 255, .18); }
+@media (min-width: 900px) {
+  .g-bottom { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 40px; }
+}
+@media (max-width: 380px) { .g-word { font-size: 18vw; } }
+
+.v-giant .section { background: transparent; padding: 22px 0; }
+.v-giant .section > .container {
+  background: rgba(14, 12, 16, .62); border: 1px solid rgba(255, 255, 255, .1); border-radius: 22px;
+  padding: 30px 18px; backdrop-filter: blur(10px) saturate(1.1); -webkit-backdrop-filter: blur(10px) saturate(1.1);
+}
+.v-giant main { padding-bottom: 40px; }
+.v-giant .eyebrow { color: var(--neon-soft); }
+.v-giant .section-title {
+  font-family: var(--font-serif); font-weight: 600; letter-spacing: 0;
+  font-size: clamp(2rem, 1.5rem + 2.2vw, 3rem);
+}
+.v-giant .about-bullets li, .v-giant .service-card {
+  background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .12);
+}
+.v-giant .service-card { border-top-color: rgba(255, 255, 255, .35); }
+.v-giant .about-copy p, .v-giant .service-card p, .v-giant .services-note { color: rgba(255, 255, 255, .8); }
+.v-giant .about-bullets li, .v-giant .facts dd, .v-giant .facts dd a { color: #fff; }
+.v-giant .facts dt { color: rgba(255, 255, 255, .6); }
+.v-giant .btn-outline, .v-giant .btn-ghost { color: #fff; border-color: rgba(255, 255, 255, .45); }
+.v-giant .btn-outline:hover, .v-giant .btn-ghost:hover { background: rgba(255, 255, 255, .1); }
+.v-giant .gallery-grid li, .v-giant .contacts-map { background: rgba(255, 255, 255, .06); }
+.v-giant .rating-badge { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); color: #fff; }
+.v-giant .map-placeholder { background: rgba(20, 16, 24, .9); }
+.v-giant .site-footer { background: rgba(8, 6, 10, .92); }
+@media (min-width: 960px) {
+  .v-giant .section { padding: 28px 0; }
+  .v-giant .section > .container { padding: 48px 44px; }
+}
+
+.circle-in { overflow: hidden; border-radius: 16px; }
+.js .circle-in { clip-path: circle(0% at 50% 50%); }
+.js .circle-in.is-open { clip-path: circle(75% at 50% 50%); transition: clip-path 1.2s cubic-bezier(.6, 0, .2, 1); }
+@media (prefers-reduced-motion: reduce) { .js .circle-in, .js .circle-in.is-open { clip-path: none; transition: none; } }
