@@ -58,7 +58,7 @@
 }
 
 /* sections stay on black; works drop on enter */
-.v-drop .section { background: #000; }
+.v-drop .section { background: #000; position: relative; z-index: 2; }
 .v-drop .about, .v-drop .services, .v-drop .gallery, .v-drop .contacts { background: #000; }
 .v-drop .about-bullets li, .v-drop .service-card {
   background: #121212; border-color: rgba(255, 255, 255, .1);
@@ -73,7 +73,7 @@
 .v-drop .map-placeholder { background: #121212; }
 .v-drop .btn-ghost { color: #fff; border-color: rgba(255, 255, 255, .4); }
 .v-drop .btn-outline { color: #fff; }
-.v-drop .site-footer { background: #000; border-top-color: rgba(232, 74, 155, .35); }
+.v-drop .site-footer { background: #000; border-top-color: rgba(232, 74, 155, .35); position: relative; z-index: 2; }
 
 /* gallery works drop from above when section enters */
 .js .v-drop .gallery-works li {
