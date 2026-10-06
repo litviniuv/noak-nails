@@ -1,3 +1,5 @@
+/* Noak Nails · demo · sticky chrome, mobile menu scroll-lock (measure target while lock
+   active — no jump-to-top), YClients booking dialog, click-to-load map, reveal. */
 (function () {
   'use strict';
   var root = document.documentElement;
@@ -6,6 +8,7 @@
   var chrome = document.querySelector('.site-chrome');
   var btn = document.querySelector('.menu-btn');
   var menu = document.getElementById('site-menu');
+  var label = btn ? btn.querySelector('.menu-label') : null;
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isOpen = false;
   var savedY = 0;
@@ -23,6 +26,11 @@
     window.scrollTo(0, y);
     root.style.scrollBehavior = prev;
   }
+  /* document Y; valid normally and while body is fixed (menu lock active) */
+  function docTop(el) {
+    var base = root.classList.contains('menu-open') ? savedY : (window.scrollY || window.pageYOffset || 0);
+    return Math.max(0, Math.round(el.getBoundingClientRect().top + base - chromeHeight()));
+  }
 
   function lockScroll(cls) {
     if (lockDepth === 0) {
@@ -36,18 +44,23 @@
     lockDepth++;
     root.classList.add(cls);
   }
-  function unlockScroll(cls) {
+  function unlockScroll(cls, destY) {
     root.classList.remove(cls);
     lockDepth = Math.max(0, lockDepth - 1);
     if (lockDepth > 0) return;
-    var y = savedY;
+    var y = typeof destY === 'number' ? destY : savedY;
     body.style.position = '';
     body.style.top = '';
     body.style.left = '';
     body.style.right = '';
     body.style.width = '';
     jumpTo(y);
-    requestAnimationFrame(function () { if (Math.abs((window.scrollY || 0) - y) > 0) jumpTo(y); });
+    requestAnimationFrame(function () { if (Math.abs((window.scrollY || 0) - y) > 1) jumpTo(y); });
+  }
+
+  function setMenuLabel(text) {
+    if (label) label.textContent = text;
+    else if (btn) btn.textContent = text;
   }
 
   function openMenu() {
@@ -59,16 +72,16 @@
     menu.hidden = false;
     menu.scrollTop = 0;
     btn.setAttribute('aria-expanded', 'true');
-    btn.textContent = 'Закрыть';
+    setMenuLabel('Закрыть');
     isOpen = true;
   }
-  function closeMenu(restoreFocus) {
+  function closeMenu(restoreFocus, destY) {
     if (!menu || !isOpen) return;
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
-    btn.textContent = 'Меню';
+    setMenuLabel('Меню');
     isOpen = false;
-    unlockScroll('menu-open');
+    unlockScroll('menu-open', destY);
     if (restoreFocus) btn.focus({ preventScroll: true });
   }
 
@@ -84,19 +97,15 @@
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus({ preventScroll: true }); }
       }
     });
+    menu.addEventListener('click', function (e) {
+      var a = e.target.closest ? e.target.closest('a[href]') : null;
+      if (a && a.getAttribute('href').charAt(0) !== '#') closeMenu(false);
+    });
     var mq = window.matchMedia('(min-width: 960px)');
     var onMq = function (m) { if (m.matches) closeMenu(false); };
     if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq);
   }
 
-  function targetTop(el) { return Math.max(0, Math.round(el.getBoundingClientRect().top + (window.scrollY || 0) - chromeHeight())); }
-  function scrollToId(id, smooth) {
-    var el = id && document.getElementById(id);
-    if (!el) return null;
-    var top = targetTop(el);
-    if (smooth && !reduceMotion) window.scrollTo({ top: top, behavior: 'smooth' }); else jumpTo(top);
-    return el;
-  }
   function focusSection(el) {
     var heading = el.querySelector('h1, h2') || el;
     if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
@@ -109,18 +118,26 @@
     var el = id && document.getElementById(id);
     if (!el) return;
     e.preventDefault();
-    if (isOpen) closeMenu(false);
-    requestAnimationFrame(function () {
-      scrollToId(id, true);
-      if (history.pushState) history.pushState(null, '', '#' + id);
-      if (id !== 'top' && id !== 'main') focusSection(el);
-    });
+    var dest = id === 'top' ? 0 : docTop(el);
+    if (isOpen) {
+      closeMenu(false, dest);
+    } else if (!reduceMotion) {
+      window.scrollTo({ top: dest, behavior: 'smooth' });
+    } else {
+      jumpTo(dest);
+    }
+    if (history.pushState) history.pushState(null, '', '#' + id);
+    if (id !== 'top' && id !== 'main') focusSection(el);
   });
-  window.addEventListener('hashchange', function () { scrollToId(decodeURIComponent(location.hash.slice(1)), false); });
+  function landHash() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id && document.getElementById(id);
+    if (el) jumpTo(docTop(el));
+  }
+  window.addEventListener('hashchange', landHash);
   if (location.hash.length > 1) {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    var land = function () { syncChrome(); scrollToId(decodeURIComponent(location.hash.slice(1)), false); };
-    window.addEventListener('load', function () { land(); setTimeout(land, 150); });
+    window.addEventListener('load', function () { syncChrome(); landHash(); setTimeout(landHash, 150); });
   }
 
   /* YClients booking panel */
@@ -159,7 +176,7 @@
         var src = mapWrap.getAttribute('data-map-src');
         if (!src) return;
         var iframe = document.createElement('iframe');
-        iframe.title = 'Noak Nails на Яндекс Картах';
+        iframe.title = mapWrap.getAttribute('data-map-title') || 'Noak Nails на Яндекс Картах';
         iframe.src = src;
         iframe.setAttribute('loading', 'lazy');
         iframe.allowFullscreen = true;
